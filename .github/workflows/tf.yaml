@@ -1,0 +1,45 @@
+name: 'Terraform deployment'
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+    - '**.tf'
+  push:
+    branches:
+      - main
+    paths:
+    - '**.tf'
+jobs:
+  tf_fmt:
+    name: 'Terrafrom fmt'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: "./"
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.3
+
+      - name: Terraform Fmt
+        id: FMT
+        run: terraform fmt --recursive
+
+  tf_plan_apply:
+    needs: [ "tf_fmt" ]
+    uses: ./.github/workflows/tf_template.yaml
+    with:
+      dir_name: ./
+      tf_key: DEV
+    secrets:
+      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
