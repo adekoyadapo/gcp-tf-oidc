@@ -33,6 +33,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
     uses: ./.github/workflows/tf_template.yaml
     with:
       dir_name: ./

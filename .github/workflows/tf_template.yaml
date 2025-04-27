@@ -22,11 +22,13 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
     if: ${{ github.event_name == 'pull_request' }}
     defaults:
       run:
         shell: bash
         working-directory: ${{ inputs.dir_name }}
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
