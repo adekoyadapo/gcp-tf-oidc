@@ -36,15 +36,15 @@ jobs:
         with:
           terraform_version: 1.11.3
 
-      # - name: Configure GCP credentials
-      #   id: auth
-      #   uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
-      #     create_credentials_file: true
-      #     service_account: '${{ secrets.SERVICE_ACCOUNT }}'    
-      #     token_format: "access_token"
-      #     access_token_lifetime: "120s"
+      - name: Configure GCP credentials
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+          create_credentials_file: true
+          service_account: '${{ secrets.SERVICE_ACCOUNT }}'    
+          token_format: "access_token"
+          access_token_lifetime: "120s"
 
       # - name: Terraform Init
       #   id: init
