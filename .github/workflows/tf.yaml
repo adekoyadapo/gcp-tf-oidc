@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - main
+      - feature/*
     paths:
     - '**.tf'
   push:
@@ -36,6 +36,9 @@ jobs:
 
   tf_plan_apply:
     needs: [ "tf_fmt" ]
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/tf_template.yaml
     with:
       dir_name: ./
