@@ -39,5 +39,5 @@ jobs:
       dir_name: ./
       tf_key: bootstrap
     secrets:
-      service_account: '${{ secrets.SERVICE_ACCOUNT }}' 
+      service_account: '${{ secrets.SERVICE_ACCOUNT }}'
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
