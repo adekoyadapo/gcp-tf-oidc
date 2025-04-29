@@ -38,6 +38,5 @@ jobs:
     with:
       dir_name: ./
       tf_key: bootstrap
-      sa: 
     secrets:
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
