@@ -1,13 +1,13 @@
-name: 'Run terraform'
+name: 'Run tofu'
 on:
   workflow_call:
     inputs:
       dir_name:
-        description: 'Specifies the path of the root terraform module.'
+        description: 'Specifies the path of the root tofu module.'
         required: true
         type: string
       tf_key:
-        description: 'Specifies the Terraform state file name for this plan. Workflow artifact will use same name'
+        description: 'Specifies the tofu state file name for this plan. Workflow artifact will use same name'
         required: true
         type: string
     secrets:
@@ -33,10 +33,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup tofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: 1.11.3
+          tofu_version: 1.9.1
 
       - name: Configure GCP credentials
         id: auth
@@ -48,23 +48,23 @@ jobs:
           token_format: "access_token"
           access_token_lifetime: "120s"
 
-      - name: Terraform Init
+      - name: tofu Init
         id: init
-        run: terraform init -input=false
+        run: tofu init -input=false
       
-      - name: Terraform Validate
+      - name: tofu Validate
         id: validate
-        run: terraform validate -no-color
+        run: tofu validate -no-color
       
-      - name: Terraform Plan
+      - name: tofu Plan
         id: plan
-        run: terraform plan -no-color -input=false
+        run: tofu plan -no-color -input=false
         continue-on-error: true
 
       - uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN: "tofu\n${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -75,13 +75,13 @@ jobs:
               issue_number: context.issue.number,
             })
             const botComment = comments.find(comment => {
-              return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+              return comment.user.type === 'Bot' && comment.body.includes('OpenTofu Format and Style')
             })
       
             // 2. Prepare format of the comment
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            const output = `#### OpenTofu Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### OpenTofu Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### OpenTofu Validation 🤖\`${{ steps.validate.outcome }}\`
             <details><summary>Validation Output</summary>
       
             \`\`\`\n
@@ -90,7 +90,7 @@ jobs:
       
             </details>
       
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            #### OpenTofu Plan 📖\`${{ steps.plan.outcome }}\`
       
             <details><summary>Show Plan</summary>
       
@@ -134,10 +134,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup tofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: 1.11.3
+          tofu_version: 1.9.1
 
       - name: Configure GCP credentials
         id: auth
@@ -149,23 +149,23 @@ jobs:
           token_format: "access_token"
           access_token_lifetime: "120s"
 
-      - name: Terraform Init
+      - name: tofu Init
         id: init
-        run: terraform init -input=false
+        run: tofu init -input=false
 
-      - name: Plan Terraform
+      - name: Plan tofu
         id: plan
         continue-on-error: true
         run: |
-          terraform plan -input=false -no-color -out=tfplan \
-          && terraform show -no-color tfplan
+          tofu plan -input=false -no-color -out=tfplan \
+          && tofu show -no-color tfplan
 
-      - name: Apply Terraform
+      - name: Apply tofu
         if: steps.plan.outcome == 'success'
         id: apply
         continue-on-error: true
         run: |
-          terraform apply \
+          tofu apply \
             -input=false \
             -no-color \
             "tfplan"

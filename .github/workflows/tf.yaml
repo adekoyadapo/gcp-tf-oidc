@@ -1,4 +1,4 @@
-name: 'Terraform deployment'
+name: 'tofu deployment'
 on:
   workflow_dispatch:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - main
 jobs:
   tf_fmt:
-    name: 'Terrafrom fmt'
+    name: 'tofu fmt'
     runs-on: ubuntu-latest
 
     defaults:
@@ -19,14 +19,14 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup tofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: 1.11.3
+          tofu_version: 1.9.1
 
-      - name: Terraform Fmt
+      - name: tofu Fmt
         id: FMT
-        run: terraform fmt --recursive
+        run: tofu fmt --recursive
 
   tf_plan_apply:
     needs: [ "tf_fmt" ]
@@ -37,7 +37,7 @@ jobs:
     uses: ./.github/workflows/tf_template.yaml
     with:
       dir_name: ./
-      tf_key: DEV
+      tf_key: bootstrap
     secrets:
+      service_account: '${{ secrets.SERVICE_ACCOUNT }}'
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
